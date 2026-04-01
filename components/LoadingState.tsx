@@ -26,7 +26,7 @@ export default function LoadingState() {
         <div className="absolute inset-0 rounded-full border-4 border-orange" />
         <div className="absolute inset-0 rounded-full border-4 border-beige border-t-transparent animate-spin" />
       </div>
-      <p className="text-beige text-base font-medium transition-all duration-500">
+      <p className="text-orange text-base font-medium transition-all duration-500">
         {MESSAGES[index]}
       </p>
     </div>

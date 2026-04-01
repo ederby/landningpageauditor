@@ -8,6 +8,7 @@ import CheckItem from "@/components/CheckItem";
 import ReportSummary from "@/components/ReportSummary";
 import LeadCTA from "@/components/LeadCTA";
 import { type ReportData } from "@/lib/types";
+import logo from "@/public/relativt-logo.svg";
 
 const CATEGORY_LABELS: Record<string, string> = {
   performance: "Prestanda",
@@ -18,7 +19,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 export default function Home() {
   const [report, setReport] = useState<ReportData | null>(null);
 
-  console.log(report);
+  console.log(logo);
 
   function handleReset() {
     setReport(null);
@@ -86,7 +87,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-red flex flex-col">
+    <div className="min-h-[calc(100vh-80px)] bg-red flex flex-col">
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-20">
         <div className="w-full max-w-237.5 text-center">
           <h1 className="text-h1 font-bold leading-tight mb-5 text-beige">
