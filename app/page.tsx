@@ -27,7 +27,7 @@ export default function Home() {
 
   if (report) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen scroll-smooth">
         <div>
           <div className="bg-beige section-padding flex flex-col justify-center items-center">
             <div className="w-full max-w-240 px-5">
@@ -94,7 +94,8 @@ export default function Home() {
             Varför genererar din webbplats inga kunder?
           </h1>
           <p className="text-beige text-lg mb-10">
-            Klistra in din URL nedan. Du får en gratis rapport inom 10 sekunder.
+            Klistra in din URL nedan. Du får en gratis rapport inom några
+            sekunder.
           </p>
           <AnalyzerForm onReport={setReport} />
         </div>

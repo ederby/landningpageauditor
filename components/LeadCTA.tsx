@@ -64,7 +64,7 @@ export default function LeadCTA({ report }: Props) {
             Ange din e-post så kommer din rapport som ett mail.
           </p>
           {submitted ? (
-            <p className="text-orange">Tack! Vi hör av oss.</p>
+            <p className="text-orange">Tack! Din rapport är på väg!.</p>
           ) : (
             <form
               onSubmit={handleEmailSubmit}

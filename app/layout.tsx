@@ -3,9 +3,9 @@ import "./globals.css";
 import logo from "@/public/relativt-logo.svg";
 
 export const metadata: Metadata = {
-  title: "Landningssidegranskning — Relativt",
+  title: "Sajtkollen — Relativt",
   description:
-    "Få en gratis rapport om varför din webbplats inte genererar leads. Analysera din sajt på 10 sekunder.",
+    "Få en gratis rapport om varför din webbplats inte genererar leads. Analysera din sajt på några sekunder.",
 };
 
 export default function RootLayout({
@@ -21,7 +21,7 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://use.typekit.net/vzb0tbu.css" />
       </head>
       <body className="min-h-full flex flex-col font-sans text-slate-800 bg-white">
-        <header className="h-20 flex items-center justify-center">
+        <header className="h-20 flex items-center justify-center bg-red">
           <a href="https://relativt.se/" target="_blank">
             <img
               className="w-full max-w-35"

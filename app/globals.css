@@ -26,6 +26,7 @@
 
 body {
   font-family: var(--font-sans);
+  scroll-behavior: smooth;
 }
 p {
   @apply text-body;

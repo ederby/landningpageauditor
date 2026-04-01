@@ -307,7 +307,7 @@ export function generateReport(
   }
 
   const leadText =
-    "Vi på Relativt hjälper tjänsteföretag att bygga webbsidor och landningssidor som faktiskt genererar kunder. Vill du att vi tittar på er sajt och berättar vad som behöver åtgärdas?";
+    "Vi på Relativt hjälper företag att bygga webbsidor och landningssidor som faktiskt genererar kunder. Vill du att vi tittar på er sajt och berättar vad som behöver åtgärdas?";
 
   return {
     url,
