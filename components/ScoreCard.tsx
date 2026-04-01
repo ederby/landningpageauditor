@@ -1,33 +1,39 @@
-import { type CategoryResult } from '@/lib/types'
+import { type CategoryResult } from "@/lib/types";
 
 interface CardProps {
-  title: string
-  result: CategoryResult
+  title: string;
+  result: CategoryResult;
 }
 
 const STATUS_DOT = {
-  red: 'bg-red-500',
-  yellow: 'bg-amber-500',
-  green: 'bg-emerald-500',
-}
+  red: "bg-red-500",
+  yellow: "bg-amber-500",
+  green: "bg-emerald-500",
+};
 
 const STATUS_BORDER = {
-  red: 'border-red-200',
-  yellow: 'border-amber-200',
-  green: 'border-emerald-200',
-}
+  red: "border-red-200",
+  yellow: "border-amber-200",
+  green: "border-emerald-200",
+};
 
 function Card({ title, result }: CardProps) {
-  const checks = Object.values(result.checks)
-  const reds = checks.filter(c => c.status === 'red').length
-  const yellows = checks.filter(c => c.status === 'yellow').length
-  const greens = checks.filter(c => c.status === 'green').length
+  const checks = Object.values(result.checks);
+  const reds = checks.filter((c) => c.status === "red").length;
+  const yellows = checks.filter((c) => c.status === "yellow").length;
+  const greens = checks.filter((c) => c.status === "green").length;
 
   return (
-    <div className={`flex-1 rounded-xl border-2 ${STATUS_BORDER[result.status]} bg-white p-5`}>
+    <div
+      className={`flex-1 rounded-[5px] border-2 ${STATUS_BORDER[result.status]} bg-white p-5`}
+    >
       <div className="flex items-center gap-2 mb-4">
-        <span className={`w-2.5 h-2.5 rounded-full ${STATUS_DOT[result.status]}`} />
-        <h3 className="font-semibold text-slate-800 text-sm uppercase tracking-wide">{title}</h3>
+        <span
+          className={`w-2.5 h-2.5 rounded-full ${STATUS_DOT[result.status]}`}
+        />
+        <h3 className="font-semibold text-slate-800 text-sm uppercase tracking-wide">
+          {title}
+        </h3>
       </div>
       <div className="flex gap-3 text-sm">
         {reds > 0 && (
@@ -50,13 +56,13 @@ function Card({ title, result }: CardProps) {
         )}
       </div>
     </div>
-  )
+  );
 }
 
 interface Props {
-  performance: CategoryResult
-  seo: CategoryResult
-  conversion: CategoryResult
+  performance: CategoryResult;
+  seo: CategoryResult;
+  conversion: CategoryResult;
 }
 
 export default function ScoreCard({ performance, seo, conversion }: Props) {
@@ -66,5 +72,5 @@ export default function ScoreCard({ performance, seo, conversion }: Props) {
       <Card title="SEO" result={seo} />
       <Card title="Konvertering" result={conversion} />
     </div>
-  )
+  );
 }
