@@ -31,7 +31,7 @@ function Card({ title, result }: CardProps) {
         <span
           className={`w-2.5 h-2.5 rounded-full ${STATUS_DOT[result.status]}`}
         />
-        <h3 className="font-semibold text-slate-800 text-sm uppercase tracking-wide">
+        <h3 className="font-semibold text-black text-sm uppercase tracking-wide">
           {title}
         </h3>
       </div>

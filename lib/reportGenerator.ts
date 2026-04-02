@@ -303,7 +303,7 @@ export function generateReport(
   } else if (redCount <= 4) {
     summary = `${hostname} har ett antal konkreta problem som troligtvis kostar er kunder varje dag. Se rapport nedan. Vi kan hjälpa er att identifiera, prioritera och åtgärda dessa problem så att er webbplats presterar bättre och genererar fler konverteringar.`;
   } else {
-    summary = `${hostname} har allvarliga brister inom flera områden. Sidan är sannolikt inte byggd för att konvertera besökare till kunder.`;
+    summary = `${hostname} har allvarliga brister inom flera områden. Se rapport nedan. Vi kan hjälpa er att identifiera, prioritera och åtgärda dessa problem så att er webbplats presterar bättre och genererar fler konverteringar.`;
   }
 
   const leadText =

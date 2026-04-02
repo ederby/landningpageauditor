@@ -24,6 +24,11 @@
   --section-padding: clamp(35px, 8.75px + 5.469vw, 70px);
 }
 
+::selection {
+  color: #590915;
+  background: #f05924;
+}
+
 body {
   font-family: var(--font-sans);
   scroll-behavior: smooth;

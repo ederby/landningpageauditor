@@ -75,7 +75,7 @@ export default function LeadCTA({ report }: Props) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="din@epost.se"
-                className="flex-1 px-5 py-3 rounded-[5px] border border-red text-red placeholder-[#59091566] focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent text-base"
+                className="flex-1 px-5 py-3 rounded-[5px] border-2 border-red text-red placeholder-[#59091566] focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent text-base"
               />
               <button
                 type="submit"

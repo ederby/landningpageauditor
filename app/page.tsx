@@ -19,8 +19,6 @@ const CATEGORY_LABELS: Record<string, string> = {
 export default function Home() {
   const [report, setReport] = useState<ReportData | null>(null);
 
-  console.log(logo);
-
   function handleReset() {
     setReport(null);
   }
@@ -67,7 +65,7 @@ export default function Home() {
 
             {(["performance", "seo", "conversion"] as const).map((cat) => (
               <div key={cat} className="mb-8 px-5">
-                <h2 className="text-lg font-bold text-slate-800 mb-3">
+                <h2 className="text-lg font-bold text-black mb-3">
                   {CATEGORY_LABELS[cat]}
                 </h2>
                 <div className="bg-white border border-slate-200 rounded-[5px] px-5 divide-y divide-slate-100">

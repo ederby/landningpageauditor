@@ -59,10 +59,10 @@ export default function AnalyzerForm({ onReport }: Props) {
     <form onSubmit={handleSubmit} className="w-full mx-auto">
       <div className="flex flex-col sm:flex-row gap-3">
         <input
-          type="url"
+          type="text"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
-          placeholder="https://dittforetag.se"
+          placeholder="dittforetag.se"
           className="flex-1 px-5 py-3 rounded-[5px] border border-beige text-beige placeholder-pink focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent text-base"
           autoFocus
         />
