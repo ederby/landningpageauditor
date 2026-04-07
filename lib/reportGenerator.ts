@@ -39,7 +39,7 @@ function buildPerformanceChecks(ps: PageSpeedResult): Record<string, Check> {
     checks.loadTime = {
       status: "red",
       label: "Laddningstid",
-      description: `Sidan laddar på ${ttiRounded}s. 53% av mobilbesökare lämnar en sida som tar mer än 3 sekunder — det innebär att mer än hälften av era potentiella kunder aldrig ser ert erbjudande.`,
+      description: `Sidan laddar på ${ttiRounded}s. 53% av mobilbesökare lämnar en sida som tar mer än 3 sekunder, det innebär att mer än hälften av era potentiella kunder aldrig ser ert erbjudande.`,
       value: ps.tti,
     };
   } else if (ps.tti >= 2) {
@@ -53,7 +53,7 @@ function buildPerformanceChecks(ps: PageSpeedResult): Record<string, Check> {
     checks.loadTime = {
       status: "green",
       label: "Laddningstid",
-      description: `Sidan laddar snabbt (${ttiRounded}s). Bra — det påverkar både upplevelse och Google-ranking positivt.`,
+      description: `Sidan laddar snabbt (${ttiRounded}s). Bra, det påverkar både upplevelse och Google-ranking positivt.`,
       value: ps.tti,
     };
   }
@@ -94,7 +94,7 @@ function buildSeoChecks(html: HtmlParseResult): Record<string, Check> {
           status: "red",
           label: "Titel-tagg",
           description:
-            "Sidan saknar en titel-tagg. Det är det första Google läser för att förstå vad sidan handlar om — utan den riskerar sidan att rankas fel eller inte alls.",
+            "Sidan saknar en titel-tagg. Det är det första Google läser för att förstå vad sidan handlar om. Utan den riskerar sidan att rankas fel eller inte alls.",
         }
       : {
           status: "green",
@@ -109,7 +109,7 @@ function buildSeoChecks(html: HtmlParseResult): Record<string, Check> {
           status: "red",
           label: "Metabeskrivning",
           description:
-            "Sidan saknar metabeskrivning. Det är texten som syns under er länk i Google. Utan den väljer Google en slumpmässig mening — som sällan är övertygande.",
+            "Sidan saknar metabeskrivning. Det är texten som syns under er länk i Google. Utan den väljer Google en slumpmässig mening, som sällan är övertygande.",
         }
       : {
           status: "green",
@@ -123,7 +123,7 @@ function buildSeoChecks(html: HtmlParseResult): Record<string, Check> {
       status: "red",
       label: "H1-rubrik",
       description:
-        "Sidan har ingen H1-rubrik. Det är sidans viktigaste rubrik — både för besökaren och för Google.",
+        "Sidan har ingen H1-rubrik. Det är sidans viktigaste rubrik, både för besökaren och för Google.",
     };
   } else if (html.h1Count > 1) {
     checks.h1 = {
@@ -176,7 +176,7 @@ function buildConversionChecks(html: HtmlParseResult): Record<string, Check> {
       status: "red",
       label: "Call-to-action",
       description:
-        "Vi hittade ingen tydlig uppmaning att ta kontakt eller ta nästa steg. Besökare som är intresserade vet inte vad de ska göra — och lämnar.",
+        "Vi hittade ingen tydlig uppmaning att ta kontakt eller ta nästa steg. Besökare som är intresserade vet inte vad de ska göra och lämnar.",
     };
   } else if (html.ctaScore === 1) {
     checks.ctaScore = {
@@ -203,7 +203,7 @@ function buildConversionChecks(html: HtmlParseResult): Record<string, Check> {
         status: "red",
         label: "Kontaktformulär",
         description:
-          "Det finns inget kontaktformulär på sidan. Det är den lägsta tröskelåtgärden för en besökare som inte vill ringa — utan det förlorar ni troligtvis leads varje dag.",
+          "Det finns inget kontaktformulär på sidan. Det är den lägsta tröskelåtgärden för en besökare som inte vill ringa, utan det förlorar ni troligtvis leads varje dag.",
       };
 
   checks.socialProof = html.hasSocialProof
@@ -216,7 +216,7 @@ function buildConversionChecks(html: HtmlParseResult): Record<string, Check> {
         status: "red",
         label: "Socialt bevis",
         description:
-          "Sidan innehåller inga synliga omdömen, kundlogotyper eller resultat. Socialt bevis är en av de starkaste konverteringsfaktorerna — utan det måste besökaren lita blint på ert erbjudande.",
+          "Sidan innehåller inga synliga omdömen, kundlogotyper eller resultat. Socialt bevis är en av de starkaste konverteringsfaktorerna, utan det måste besökaren lita blint på ert erbjudande.",
       };
 
   if (html.wordCount < 150) {

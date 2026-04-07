@@ -3,7 +3,7 @@ import "./globals.css";
 import logo from "@/public/relativt-logo.svg";
 
 export const metadata: Metadata = {
-  title: "Sajtkollen — Relativt",
+  title: "Sajtkollen | Relativt.se",
   description:
     "Få en gratis rapport om varför din webbplats inte genererar leads. Analysera din sajt på några sekunder.",
 };
