@@ -26,7 +26,7 @@ export async function fetchPageSpeed(url: string): Promise<PageSpeedResult> {
   const tbt = lr.audits['total-blocking-time']?.numericValue ?? 0
   const cls = lr.audits['cumulative-layout-shift']?.numericValue ?? 0
   const tti = (lr.audits['interactive']?.numericValue ?? 0) / 1000
-  const isMobileFriendly = lr.audits['viewport']?.score === 1
+  const isMobileFriendly = lr.audits['viewport']?.score !== 0
 
   return { performanceScore, lcp, fcp, tbt, cls, tti, isMobileFriendly }
 }

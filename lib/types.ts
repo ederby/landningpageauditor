@@ -12,9 +12,21 @@ export interface CategoryResult {
   checks: Record<string, Check>
 }
 
+export interface CompetitorData {
+  url: string
+  score: number
+  overallStatus: Status
+  categories: {
+    performance: CategoryResult
+    seo: CategoryResult
+    conversion: CategoryResult
+  }
+}
+
 export interface ReportData {
   url: string
   timestamp: string
+  score: number
   overallStatus: Status
   categories: {
     performance: CategoryResult
@@ -23,4 +35,5 @@ export interface ReportData {
   }
   summary: string
   leadText: string
+  competitor?: CompetitorData
 }

@@ -7,6 +7,7 @@ import ScoreCard from "@/components/ScoreCard";
 import CheckItem from "@/components/CheckItem";
 import ReportSummary from "@/components/ReportSummary";
 import LeadCTA from "@/components/LeadCTA";
+import CompetitorComparison from "@/components/CompetitorComparison";
 import { type ReportData } from "@/lib/types";
 import logo from "@/public/relativt-logo.svg";
 
@@ -62,6 +63,13 @@ export default function Home() {
                 conversion={report.categories.conversion}
               />
             </div>
+
+            {report.competitor && (
+              <CompetitorComparison
+                report={report}
+                competitor={report.competitor}
+              />
+            )}
 
             {(["performance", "seo", "conversion"] as const).map((cat) => (
               <div key={cat} className="mb-8 px-5">

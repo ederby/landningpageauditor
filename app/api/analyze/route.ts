@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { fetchPageSpeed } from '@/lib/pagespeed'
 import { parseHtml } from '@/lib/htmlParser'
 import { generateReport } from '@/lib/reportGenerator'
+import { type CompetitorData } from '@/lib/types'
 
 // Simple in-memory rate limiter
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
@@ -29,32 +30,69 @@ function getIp(req: NextRequest): string {
   )
 }
 
+async function sendPingNotification(url: string, competitorUrl?: string) {
+  const webhookUrl = process.env.SLACK_WEBHOOK_URL
+  if (!webhookUrl) return
+  try {
+    const text = competitorUrl
+      ? `🔍 Ny analys: ${url} (jämförelse med ${competitorUrl})`
+      : `🔍 Ny analys: ${url}`
+    await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    })
+  } catch {
+    // Notification failure should never break the response
+  }
+}
+
 export async function POST(req: NextRequest) {
   const ip = getIp(req)
   if (!checkRateLimit(ip)) {
     return NextResponse.json({ error: 'För många anrop. Försök igen om en minut.' }, { status: 429 })
   }
 
-  let body: { url?: string }
+  let body: { url?: string; competitorUrl?: string }
   try {
     body = await req.json()
   } catch {
     return NextResponse.json({ error: 'Ogiltig request.' }, { status: 400 })
   }
 
-  const { url } = body
+  const { url, competitorUrl } = body
   if (!url || !/^https?:\/\//i.test(url)) {
     return NextResponse.json({ error: 'Ogiltig eller saknad URL. URL:en måste börja med http:// eller https://' }, { status: 400 })
   }
 
+  const hasCompetitor = Boolean(competitorUrl && /^https?:\/\//i.test(competitorUrl))
+
   try {
-    const [psResult, htmlResult] = await Promise.all([
-      fetchPageSpeed(url),
-      parseHtml(url),
+    const [mainResults, compResults] = await Promise.all([
+      Promise.all([fetchPageSpeed(url), parseHtml(url)]),
+      hasCompetitor
+        ? Promise.all([fetchPageSpeed(competitorUrl!), parseHtml(competitorUrl!)])
+        : Promise.resolve(null),
     ])
 
+    const [psResult, htmlResult] = mainResults
     const report = generateReport(url, psResult, htmlResult)
-    return NextResponse.json(report)
+
+    let competitor: CompetitorData | undefined
+    if (compResults) {
+      const [compPs, compHtml] = compResults
+      const compReport = generateReport(competitorUrl!, compPs, compHtml)
+      competitor = {
+        url: competitorUrl!,
+        score: compReport.score,
+        overallStatus: compReport.overallStatus,
+        categories: compReport.categories,
+      }
+    }
+
+    sendPingNotification(url, competitorUrl).catch(() => {})
+
+    return NextResponse.json({ ...report, competitor })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Okänt fel'
     return NextResponse.json({ error: `Analysen misslyckades: ${message}` }, { status: 500 })

@@ -7,6 +7,24 @@ import {
   type Status,
 } from "./types";
 
+function calculateScore(categories: {
+  performance: CategoryResult
+  seo: CategoryResult
+  conversion: CategoryResult
+}): number {
+  const allChecks = [
+    ...Object.values(categories.performance.checks),
+    ...Object.values(categories.seo.checks),
+    ...Object.values(categories.conversion.checks),
+  ]
+  const points = allChecks.reduce((sum, check) => {
+    if (check.status === 'green') return sum + 2
+    if (check.status === 'yellow') return sum + 1
+    return sum
+  }, 0)
+  return Math.round((points / (allChecks.length * 2)) * 100)
+}
+
 function categoryStatus(checks: Record<string, Check>): Status {
   const statuses = Object.values(checks).map((c) => c.status);
   if (statuses.includes("red")) return "red";
@@ -33,44 +51,75 @@ function overallStatus(cats: {
 function buildPerformanceChecks(ps: PageSpeedResult): Record<string, Check> {
   const checks: Record<string, Check> = {};
 
-  // loadTime based on tti
-  const ttiRounded = ps.tti.toFixed(1);
-  if (ps.tti > 3) {
-    checks.loadTime = {
+  // LCP — Largest Contentful Paint (primärt Core Web Vital för laddning)
+  const lcpRounded = ps.lcp.toFixed(1);
+  if (ps.lcp > 4) {
+    checks.lcp = {
       status: "red",
-      label: "Laddningstid",
-      description: `Sidan laddar på ${ttiRounded}s. 53% av mobilbesökare lämnar en sida som tar mer än 3 sekunder, det innebär att mer än hälften av era potentiella kunder aldrig ser ert erbjudande.`,
-      value: ps.tti,
+      label: "Laddningstid (LCP)",
+      description: `Sidans huvudinnehåll laddas på ${lcpRounded}s. Google sätter gränsen vid 2,5s. Er sida är mer än dubbelt så långsam, vilket påverkar både ranking och att besökare lämnar sidan.`,
+      value: `${lcpRounded}s`,
     };
-  } else if (ps.tti >= 2) {
-    checks.loadTime = {
+  } else if (ps.lcp > 2.5) {
+    checks.lcp = {
       status: "yellow",
-      label: "Laddningstid",
-      description: `Sidan laddar på ${ttiRounded}s. Det är godkänt men inte bra. Under 2 sekunder är målet för sidor som ska konvertera.`,
-      value: ps.tti,
+      label: "Laddningstid (LCP)",
+      description: `Sidans huvudinnehåll laddas på ${lcpRounded}s. Google rekommenderar under 2,5s för en bra upplevelse.`,
+      value: `${lcpRounded}s`,
     };
   } else {
-    checks.loadTime = {
+    checks.lcp = {
       status: "green",
-      label: "Laddningstid",
-      description: `Sidan laddar snabbt (${ttiRounded}s). Bra, det påverkar både upplevelse och Google-ranking positivt.`,
-      value: ps.tti,
+      label: "Laddningstid (LCP)",
+      description: `Sidans huvudinnehåll laddas snabbt (${lcpRounded}s). Under Googles gräns på 2,5s.`,
+      value: `${lcpRounded}s`,
     };
   }
 
-  // mobileScore based on performanceScore
-  if (ps.performanceScore < 50) {
+  // TBT — Total Blocking Time (trög interaktivitet)
+  if (ps.tbt > 600) {
+    checks.tbt = {
+      status: "red",
+      label: "Interaktivitet (TBT)",
+      description: `Sidan blockerar webbläsaren i ${ps.tbt}ms. Det innebär att klick och knapptryck inte svarar direkt. Besökare upplever sidan som fryst.`,
+      value: `${ps.tbt}ms`,
+    };
+  } else if (ps.tbt > 200) {
+    checks.tbt = {
+      status: "yellow",
+      label: "Interaktivitet (TBT)",
+      description: `Sidan har en viss fördröjning i interaktivitet (${ps.tbt}ms). Under 200ms är målet.`,
+      value: `${ps.tbt}ms`,
+    };
+  } else {
+    checks.tbt = {
+      status: "green",
+      label: "Interaktivitet (TBT)",
+      description: `Sidan svarar snabbt på interaktion (${ps.tbt}ms).`,
+      value: `${ps.tbt}ms`,
+    };
+  }
+
+  // Mobilupplevelse — performanceScore + isMobileFriendly
+  if (!ps.isMobileFriendly) {
     checks.mobileScore = {
       status: "red",
       label: "Mobilupplevelse",
-      description: `Mobilupplevelsen är bristfällig (${ps.performanceScore}/100). Över 60% av svenska webbbesökare använder mobil. En stor del av era besökare ser troligtvis en trasig eller svårnavigerad sida.`,
+      description: `Sidan är inte anpassad för mobil. Över 60% av svenska webbbesökare använder mobil och ser troligtvis en kraftigt inzoomad eller trasig layout.`,
+      value: ps.performanceScore,
+    };
+  } else if (ps.performanceScore < 50) {
+    checks.mobileScore = {
+      status: "red",
+      label: "Mobilupplevelse",
+      description: `Mobilupplevelsen är bristfällig (${ps.performanceScore}/100). Sidan är responsiv men presterar dåligt på mobila enheter.`,
       value: ps.performanceScore,
     };
   } else if (ps.performanceScore < 80) {
     checks.mobileScore = {
       status: "yellow",
       label: "Mobilupplevelse",
-      description: `Mobilupplevelsen är acceptabel men har tydliga brister (${ps.performanceScore}/100). Det finns utrymme att förbättra den.`,
+      description: `Mobilupplevelsen är acceptabel men har tydliga brister (${ps.performanceScore}/100).`,
       value: ps.performanceScore,
     };
   } else {
@@ -82,48 +131,106 @@ function buildPerformanceChecks(ps: PageSpeedResult): Record<string, Check> {
     };
   }
 
+  // CLS — Cumulative Layout Shift (hoppar element runt?)
+  const clsRounded = ps.cls.toFixed(2)
+  if (ps.cls > 0.25) {
+    checks.cls = {
+      status: 'red',
+      label: 'Layoutstabilitet',
+      description: `Sidan hoppar runt när den laddas (${clsRounded}). Element flyttar sig medan besökaren försöker klicka, vilket skapar frustration och kostar konverteringar.`,
+      value: clsRounded,
+    }
+  } else if (ps.cls > 0.1) {
+    checks.cls = {
+      status: 'yellow',
+      label: 'Layoutstabilitet',
+      description: `Sidan rör sig lite när den laddas (${clsRounded}). Googles rekommendation är under 0,1.`,
+      value: clsRounded,
+    }
+  } else {
+    checks.cls = {
+      status: 'green',
+      label: 'Layoutstabilitet',
+      description: `Sidan är stabil när den laddas (${clsRounded}).`,
+      value: clsRounded,
+    }
+  }
+
   return checks;
 }
 
 function buildSeoChecks(html: HtmlParseResult): Record<string, Check> {
   const checks: Record<string, Check> = {};
 
-  checks.metaTitle =
-    html.metaTitle === null
-      ? {
-          status: "red",
-          label: "Titel-tagg",
-          description:
-            "Sidan saknar en titel-tagg. Det är det första Google läser för att förstå vad sidan handlar om. Utan den riskerar sidan att rankas fel eller inte alls.",
-        }
-      : {
-          status: "green",
-          label: "Titel-tagg",
-          description: "Sidan har en metatitel.",
-          value: html.metaTitle,
-        };
+  // Titel-tagg — existens och längd (30–60 tecken är optimalt)
+  if (html.metaTitle === null) {
+    checks.metaTitle = {
+      status: "red",
+      label: "Titel-tagg",
+      description:
+        "Sidan saknar en titel-tagg. Det är det första Google läser. Utan den riskerar sidan att rankas fel eller inte alls.",
+    };
+  } else if (html.metaTitleLength !== null && html.metaTitleLength < 30) {
+    checks.metaTitle = {
+      status: "yellow",
+      label: "Titel-tagg",
+      description: `Titeln är för kort (${html.metaTitleLength} tecken). En bra titel är 30–60 tecken och beskriver tydligt vad sidan erbjuder.`,
+      value: html.metaTitle,
+    };
+  } else if (html.metaTitleLength !== null && html.metaTitleLength > 60) {
+    checks.metaTitle = {
+      status: "yellow",
+      label: "Titel-tagg",
+      description: `Titeln är för lång (${html.metaTitleLength} tecken) och kapas i sökresultaten. Håll den under 60 tecken.`,
+      value: html.metaTitle,
+    };
+  } else {
+    checks.metaTitle = {
+      status: "green",
+      label: "Titel-tagg",
+      description: `Sidan har en välformulerad titel (${html.metaTitleLength} tecken).`,
+      value: html.metaTitle,
+    };
+  }
 
-  checks.metaDescription =
-    html.metaDescription === null
-      ? {
-          status: "red",
-          label: "Metabeskrivning",
-          description:
-            "Sidan saknar metabeskrivning. Det är texten som syns under er länk i Google. Utan den väljer Google en slumpmässig mening, som sällan är övertygande.",
-        }
-      : {
-          status: "green",
-          label: "Metabeskrivning",
-          description: "Sidan har en metabeskrivning.",
-          value: html.metaDescription,
-        };
+  // Metabeskrivning — existens och längd (120–160 tecken är optimalt)
+  if (html.metaDescription === null) {
+    checks.metaDescription = {
+      status: "red",
+      label: "Metabeskrivning",
+      description:
+        "Sidan saknar metabeskrivning. Det är texten som syns under er länk i Google. Utan den väljer Google en slumpmässig mening som sällan är övertygande.",
+    };
+  } else if (html.metaDescriptionLength !== null && html.metaDescriptionLength < 80) {
+    checks.metaDescription = {
+      status: "yellow",
+      label: "Metabeskrivning",
+      description: `Metabeskrivningen är för kort (${html.metaDescriptionLength} tecken). Sikta på 120–160 tecken för att fylla hela utrymmet i sökresultaten.`,
+      value: html.metaDescription,
+    };
+  } else if (html.metaDescriptionLength !== null && html.metaDescriptionLength > 160) {
+    checks.metaDescription = {
+      status: "yellow",
+      label: "Metabeskrivning",
+      description: `Metabeskrivningen är för lång (${html.metaDescriptionLength} tecken) och kapas i sökresultaten. Håll den under 160 tecken.`,
+      value: html.metaDescription,
+    };
+  } else {
+    checks.metaDescription = {
+      status: "green",
+      label: "Metabeskrivning",
+      description: `Sidan har en bra metabeskrivning (${html.metaDescriptionLength} tecken).`,
+      value: html.metaDescription,
+    };
+  }
 
+  // H1-rubrik
   if (html.h1Count === 0) {
     checks.h1 = {
       status: "red",
       label: "H1-rubrik",
       description:
-        "Sidan har ingen H1-rubrik. Det är sidans viktigaste rubrik, både för besökaren och för Google.",
+        "Sidan har ingen H1-rubrik. Det är sidans viktigaste rubrik, för både besökaren och Google.",
     };
   } else if (html.h1Count > 1) {
     checks.h1 = {
@@ -140,6 +247,37 @@ function buildSeoChecks(html: HtmlParseResult): Record<string, Check> {
     };
   }
 
+  // HTTPS
+  if (!html.isHttps) {
+    checks.https = {
+      status: 'red',
+      label: 'Säker anslutning (HTTPS)',
+      description: 'Sidan är inte krypterad. Webbläsare visar "Inte säker" för besökarna, vilket sänker förtroendet omedelbart. Google rankar dessutom HTTPS-sidor högre.',
+    }
+  } else {
+    checks.https = {
+      status: 'green',
+      label: 'Säker anslutning (HTTPS)',
+      description: 'Sidan är krypterad och säker.',
+    }
+  }
+
+  // Open Graph — hur sidan ser ut vid delning på sociala medier
+  if (!html.hasOpenGraph) {
+    checks.openGraph = {
+      status: 'yellow',
+      label: 'Delning i sociala medier',
+      description: 'Sidan saknar inställningar för hur den visas när den delas på LinkedIn, Facebook eller i Slack. Utan det visas delningar utan bild och med en generisk rubrik, vilket ger ett oprofessionellt intryck och färre klick.',
+    }
+  } else {
+    checks.openGraph = {
+      status: 'green',
+      label: 'Delning i sociala medier',
+      description: 'Sidan är korrekt inställd för delning i sociala medier.',
+    }
+  }
+
+  // Alt-texter
   if (html.imagesTotal > 0) {
     const missingRatio = html.imagesMissingAlt / html.imagesTotal;
     if (missingRatio > 0.3) {
@@ -171,6 +309,7 @@ function buildSeoChecks(html: HtmlParseResult): Record<string, Check> {
 function buildConversionChecks(html: HtmlParseResult): Record<string, Check> {
   const checks: Record<string, Check> = {};
 
+  // CTA
   if (html.ctaScore === 0) {
     checks.ctaScore = {
       status: "red",
@@ -193,6 +332,7 @@ function buildConversionChecks(html: HtmlParseResult): Record<string, Check> {
     };
   }
 
+  // Kontaktformulär
   checks.contactForm = html.hasForms
     ? {
         status: "green",
@@ -203,9 +343,10 @@ function buildConversionChecks(html: HtmlParseResult): Record<string, Check> {
         status: "red",
         label: "Kontaktformulär",
         description:
-          "Det finns inget kontaktformulär på sidan. Det är den lägsta tröskelåtgärden för en besökare som inte vill ringa, utan det förlorar ni troligtvis leads varje dag.",
+          "Det finns inget kontaktformulär på sidan. Det är det enklaste sättet för besökare att höra av sig utan att ringa. Utan det förlorar ni troligtvis leads varje dag.",
       };
 
+  // Socialt bevis
   checks.socialProof = html.hasSocialProof
     ? {
         status: "green",
@@ -216,9 +357,10 @@ function buildConversionChecks(html: HtmlParseResult): Record<string, Check> {
         status: "red",
         label: "Socialt bevis",
         description:
-          "Sidan innehåller inga synliga omdömen, kundlogotyper eller resultat. Socialt bevis är en av de starkaste konverteringsfaktorerna, utan det måste besökaren lita blint på ert erbjudande.",
+          "Sidan innehåller inga synliga omdömen, kundlogotyper eller resultat. Socialt bevis är en av de starkaste konverteringsfaktorerna. Utan det måste besökaren lita blint på ert erbjudande.",
       };
 
+  // Innehållsmängd
   if (html.wordCount < 150) {
     checks.wordCount = {
       status: "red",
@@ -242,6 +384,7 @@ function buildConversionChecks(html: HtmlParseResult): Record<string, Check> {
     };
   }
 
+  // Telefonnummer
   checks.phoneNumber = html.hasPhone
     ? {
         status: "green",
@@ -312,6 +455,7 @@ export function generateReport(
   return {
     url,
     timestamp: new Date().toISOString(),
+    score: calculateScore(categories),
     overallStatus: overall,
     categories,
     summary,
