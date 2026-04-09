@@ -11,6 +11,8 @@ import React from "react";
 const mockReport: ReportData = {
   url: "https://exempelforetag.se",
   timestamp: new Date().toISOString(),
+  score: 58,
+  keyword: null,
   overallStatus: "yellow",
   categories: {
     performance: {
