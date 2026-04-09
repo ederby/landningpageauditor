@@ -15,6 +15,7 @@ export interface CategoryResult {
 export interface CompetitorData {
   url: string
   score: number
+  keyword: string | null
   overallStatus: Status
   categories: {
     performance: CategoryResult
@@ -27,6 +28,7 @@ export interface ReportData {
   url: string
   timestamp: string
   score: number
+  keyword: string | null
   overallStatus: Status
   categories: {
     performance: CategoryResult

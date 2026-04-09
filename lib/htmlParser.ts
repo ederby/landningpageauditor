@@ -16,6 +16,11 @@ export interface HtmlParseResult {
   hasSocialProof: boolean
   hasOpenGraph: boolean
   isHttps: boolean
+  keyword: string | null
+  keywordInTitle: boolean | null
+  keywordInH1: boolean | null
+  keywordInMetaDescription: boolean | null
+  keywordBodyCount: number | null
   fetchError: boolean
 }
 
@@ -165,7 +170,7 @@ function detectSocialProof($: cheerio.CheerioAPI): boolean {
   return score >= 2
 }
 
-export async function parseHtml(url: string): Promise<HtmlParseResult> {
+export async function parseHtml(url: string, keyword?: string): Promise<HtmlParseResult> {
   let html: string
   try {
     const res = await fetch(url, {
@@ -191,6 +196,11 @@ export async function parseHtml(url: string): Promise<HtmlParseResult> {
       hasSocialProof: false,
       hasOpenGraph: false,
       isHttps: url.startsWith('https://'),
+      keyword: keyword ?? null,
+      keywordInTitle: null,
+      keywordInH1: null,
+      keywordInMetaDescription: null,
+      keywordBodyCount: null,
       fetchError: true,
     }
   }
@@ -232,6 +242,28 @@ export async function parseHtml(url: string): Promise<HtmlParseResult> {
   )
   const isHttps = url.startsWith('https://')
 
+  const normalizedKeyword = keyword?.trim().toLowerCase() || null
+  let keywordInTitle: boolean | null = null
+  let keywordInH1: boolean | null = null
+  let keywordInMetaDescription: boolean | null = null
+  let keywordBodyCount: number | null = null
+
+  if (normalizedKeyword) {
+    keywordInTitle = (metaTitle ?? '').toLowerCase().includes(normalizedKeyword)
+    keywordInH1 = $('h1').text().toLowerCase().includes(normalizedKeyword)
+    keywordInMetaDescription = metaDescription
+      ? metaDescription.toLowerCase().includes(normalizedKeyword)
+      : null
+    const bodyLower = bodyText.toLowerCase()
+    let count = 0
+    let pos = 0
+    while ((pos = bodyLower.indexOf(normalizedKeyword, pos)) !== -1) {
+      count++
+      pos += normalizedKeyword.length
+    }
+    keywordBodyCount = count
+  }
+
   return {
     metaTitle,
     metaTitleLength,
@@ -248,6 +280,11 @@ export async function parseHtml(url: string): Promise<HtmlParseResult> {
     hasSocialProof,
     hasOpenGraph,
     isHttps,
+    keyword: normalizedKeyword,
+    keywordInTitle,
+    keywordInH1,
+    keywordInMetaDescription,
+    keywordBodyCount,
     fetchError: false,
   }
 }

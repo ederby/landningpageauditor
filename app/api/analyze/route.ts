@@ -53,14 +53,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'För många anrop. Försök igen om en minut.' }, { status: 429 })
   }
 
-  let body: { url?: string; competitorUrl?: string }
+  let body: { url?: string; competitorUrl?: string; keyword?: string }
   try {
     body = await req.json()
   } catch {
     return NextResponse.json({ error: 'Ogiltig request.' }, { status: 400 })
   }
 
-  const { url, competitorUrl } = body
+  const { url, competitorUrl, keyword } = body
   if (!url || !/^https?:\/\//i.test(url)) {
     return NextResponse.json({ error: 'Ogiltig eller saknad URL. URL:en måste börja med http:// eller https://' }, { status: 400 })
   }
@@ -69,9 +69,9 @@ export async function POST(req: NextRequest) {
 
   try {
     const [mainResults, compResults] = await Promise.all([
-      Promise.all([fetchPageSpeed(url), parseHtml(url)]),
+      Promise.all([fetchPageSpeed(url), parseHtml(url, keyword)]),
       hasCompetitor
-        ? Promise.all([fetchPageSpeed(competitorUrl!), parseHtml(competitorUrl!)])
+        ? Promise.all([fetchPageSpeed(competitorUrl!), parseHtml(competitorUrl!, keyword)])
         : Promise.resolve(null),
     ])
 
@@ -85,6 +85,7 @@ export async function POST(req: NextRequest) {
       competitor = {
         url: competitorUrl!,
         score: compReport.score,
+        keyword: compReport.keyword,
         overallStatus: compReport.overallStatus,
         categories: compReport.categories,
       }

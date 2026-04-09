@@ -24,6 +24,7 @@ function normalizeUrl(raw: string): string | null {
 
 export default function AnalyzerForm({ onReport }: Props) {
   const [url, setUrl] = useState("");
+  const [keyword, setKeyword] = useState("");
   const [showCompetitor, setShowCompetitor] = useState(false);
   const [competitorUrl, setCompetitorUrl] = useState("");
   const [loading, setLoading] = useState(false);
@@ -63,6 +64,7 @@ export default function AnalyzerForm({ onReport }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           url: normalized,
+          ...(keyword.trim() && { keyword: keyword.trim() }),
           ...(normalizedCompetitor && { competitorUrl: normalizedCompetitor }),
         }),
       });
@@ -130,6 +132,16 @@ export default function AnalyzerForm({ onReport }: Props) {
           </button>
         </div>
       )}
+
+      <div className="w-full mt-3">
+        <input
+          type="text"
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+          placeholder="Sökord ni vill ranka på, t.ex. webbyrå stockholm (valfritt)"
+          className="w-full px-5 py-3 rounded-[5px] border border-beige/50 text-beige placeholder-pink/60 focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent text-base"
+        />
+      </div>
 
       <button
         type="button"

@@ -277,6 +277,73 @@ function buildSeoChecks(html: HtmlParseResult): Record<string, Check> {
     }
   }
 
+  // Sökordsanalys — visas bara om användaren angett ett sökord
+  if (html.keyword) {
+    const kw = `"${html.keyword}"`;
+
+    checks.keywordInH1 = html.keywordInH1
+      ? {
+          status: 'green',
+          label: 'Sökord i rubrik (H1)',
+          description: `Sökordet ${kw} finns i sidans huvudrubrik.`,
+        }
+      : {
+          status: 'red',
+          label: 'Sökord i rubrik (H1)',
+          description: `Sökordet ${kw} saknas i sidans huvudrubrik. Det är en av de viktigaste platserna för Google att förstå vad sidan handlar om.`,
+        };
+
+    checks.keywordInTitle = html.keywordInTitle
+      ? {
+          status: 'green',
+          label: 'Sökord i titel-tagg',
+          description: `Sökordet ${kw} finns i titel-taggen.`,
+        }
+      : {
+          status: 'yellow',
+          label: 'Sökord i titel-tagg',
+          description: `Sökordet ${kw} saknas i titel-taggen. Titel-taggen är en av de starkaste SEO-signalerna och bör innehålla det viktigaste sökordet.`,
+        };
+
+    if (html.keywordInMetaDescription !== null) {
+      checks.keywordInMetaDescription = html.keywordInMetaDescription
+        ? {
+            status: 'green',
+            label: 'Sökord i metabeskrivning',
+            description: `Sökordet ${kw} finns i metabeskrivningen.`,
+          }
+        : {
+            status: 'yellow',
+            label: 'Sökord i metabeskrivning',
+            description: `Sökordet ${kw} saknas i metabeskrivningen. Att ha med det ökar klickfrekvensen från sökresultaten.`,
+          };
+    }
+
+    const count = html.keywordBodyCount ?? 0;
+    if (count === 0) {
+      checks.keywordInBody = {
+        status: 'red',
+        label: 'Sökord i texten',
+        description: `Sökordet ${kw} förekommer inte i sidans text. Google kan inte avgöra vad sidan handlar om.`,
+        value: 0,
+      };
+    } else if (count <= 2) {
+      checks.keywordInBody = {
+        status: 'yellow',
+        label: 'Sökord i texten',
+        description: `Sökordet ${kw} förekommer bara ${count} gång${count > 1 ? 'er' : ''} i texten. Sikta på minst 3 förekomster för en tydligare SEO-signal.`,
+        value: count,
+      };
+    } else {
+      checks.keywordInBody = {
+        status: 'green',
+        label: 'Sökord i texten',
+        description: `Sökordet ${kw} förekommer ${count} gånger i texten.`,
+        value: count,
+      };
+    }
+  }
+
   // Alt-texter
   if (html.imagesTotal > 0) {
     const missingRatio = html.imagesMissingAlt / html.imagesTotal;
@@ -456,6 +523,7 @@ export function generateReport(
     url,
     timestamp: new Date().toISOString(),
     score: calculateScore(categories),
+    keyword: html.keyword,
     overallStatus: overall,
     categories,
     summary,
