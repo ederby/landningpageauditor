@@ -97,11 +97,12 @@ export default function Home() {
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-20">
         <div className="w-full max-w-237.5 text-center">
           <h1 className="text-h1 font-bold leading-tight mb-5 text-beige">
-            Varför genererar din webbplats inga kunder?
+            Hur optimerad är din webbplats egentligen?
           </h1>
           <p className="text-beige text-lg mb-10">
-            Klistra in din URL nedan. Du får en gratis rapport inom några
-            sekunder.
+            Analysera prestanda, SEO och konvertering och jämför direkt med en
+            konkurrent. Perfekt för dig som vill förstå hur din webbplats kan
+            bli bättre.
           </p>
           <AnalyzerForm onReport={setReport} />
         </div>

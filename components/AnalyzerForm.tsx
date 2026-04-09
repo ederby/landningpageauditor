@@ -24,11 +24,17 @@ function normalizeUrl(raw: string): string | null {
 
 export default function AnalyzerForm({ onReport }: Props) {
   const [url, setUrl] = useState("");
+  const [showKeyword, setShowKeyword] = useState(false);
   const [keyword, setKeyword] = useState("");
   const [showCompetitor, setShowCompetitor] = useState(false);
   const [competitorUrl, setCompetitorUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  function toggleKeyword() {
+    setShowKeyword((v) => !v);
+    if (showKeyword) setKeyword("");
+  }
 
   function toggleCompetitor() {
     setShowCompetitor((v) => !v);
@@ -52,7 +58,7 @@ export default function AnalyzerForm({ onReport }: Props) {
 
     if (showCompetitor && competitorUrl.trim() && !normalizedCompetitor) {
       setError(
-        "Konkurrentens URL verkar inte vara giltig. Kontrollera och försök igen."
+        "Konkurrentens URL verkar inte vara giltig. Kontrollera och försök igen.",
       );
       return;
     }
@@ -89,9 +95,12 @@ export default function AnalyzerForm({ onReport }: Props) {
     );
 
   return (
-    <form onSubmit={handleSubmit} className="w-full mx-auto flex flex-col items-center">
-      {showCompetitor ? (
-        <div className="w-full flex flex-col sm:flex-row gap-3">
+    <form
+      onSubmit={handleSubmit}
+      className="w-full mx-auto flex flex-col items-center gap-2.5"
+    >
+      <div className="w-full flex flex-col gap-3">
+        <div className="flex flex-col sm:flex-row gap-4.5">
           <input
             type="text"
             value={url}
@@ -100,63 +109,57 @@ export default function AnalyzerForm({ onReport }: Props) {
             className="flex-1 px-5 py-3 rounded-[5px] border border-beige text-beige placeholder-pink focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent text-base"
             autoFocus
           />
+          {showCompetitor && (
+            <input
+              type="text"
+              value={competitorUrl}
+              onChange={(e) => setCompetitorUrl(e.target.value)}
+              placeholder="konkurrenten.se"
+              className="flex-1 px-5 py-3 rounded-[5px] border border-beige text-beige placeholder-pink focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent text-base"
+            />
+          )}
+        </div>
+        {showKeyword && (
           <input
             type="text"
-            value={competitorUrl}
-            onChange={(e) => setCompetitorUrl(e.target.value)}
-            placeholder="konkurrenten.se"
-            className="flex-1 px-5 py-3 rounded-[5px] border border-beige text-beige placeholder-pink focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent text-base"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            placeholder="t.ex. webbyrå göteborg"
+            className="w-full px-5 py-3 rounded-[5px] border border-beige text-beige placeholder-pink focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent text-base"
           />
-          <button
-            type="submit"
-            className="sm:px-5 md:px-17.5 py-4 bg-orange cursor-pointer text-red hover:text-beige font-semibold rounded-[5px] transition-colors whitespace-nowrap text-base"
-          >
-            Analysera båda
-          </button>
-        </div>
-      ) : (
-        <div className="w-full flex flex-col sm:flex-row gap-3">
-          <input
-            type="text"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="dittforetag.se"
-            className="flex-1 px-5 py-3 rounded-[5px] border border-beige text-beige placeholder-pink focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent text-base"
-            autoFocus
-          />
-          <button
-            type="submit"
-            className="sm:px-5 md:px-17.5 py-4 bg-orange cursor-pointer text-red hover:text-beige font-semibold rounded-[5px] transition-colors whitespace-nowrap text-base"
-          >
-            Analysera min sajt
-          </button>
-        </div>
-      )}
-
-      <div className="w-full mt-3">
-        <input
-          type="text"
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-          placeholder="Sökord ni vill ranka på, t.ex. webbyrå stockholm (valfritt)"
-          className="w-full px-5 py-3 rounded-[5px] border border-beige/50 text-beige placeholder-pink/60 focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent text-base"
-        />
+        )}
+        <button
+          type="submit"
+          className="w-full sm:w-fit sm:px-5 md:px-17.5 py-4 bg-orange cursor-pointer text-red hover:text-beige font-semibold rounded-[5px] transition-colors whitespace-nowrap text-base self-center"
+        >
+          {showCompetitor ? "Analysera båda" : "Analysera min sajt"}
+        </button>
       </div>
 
-      <button
-        type="button"
-        onClick={toggleCompetitor}
-        className="mt-3 text-sm text-beige/60 hover:text-beige underline underline-offset-2 transition-colors"
-      >
-        {showCompetitor
-          ? "Ta bort konkurrentjämförelse"
-          : "+ Jämför med en konkurrent (valfritt)"}
-      </button>
+      <div className="mt-3 flex flex-wrap justify-center gap-x-5 gap-y-1">
+        <button
+          type="button"
+          onClick={toggleKeyword}
+          className="text-sm text-beige/60 hover:text-beige underline underline-offset-2 transition-colors"
+        >
+          {showKeyword ? "Ta bort sökord" : "+ Lägg till sökord"}
+        </button>
+        <button
+          type="button"
+          onClick={toggleCompetitor}
+          className="text-sm text-beige/60 hover:text-beige underline underline-offset-2 transition-colors"
+        >
+          {showCompetitor
+            ? "Ta bort konkurrentjämförelse"
+            : "+ Jämför med en konkurrent"}
+        </button>
+      </div>
 
       {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
-      <p className="mt-3 text-beige/50 text-sm">
-        Analysen gäller sidan du skriver in, inte hela webbplatsen.
-      </p>
+      <span className="mt-3 text-beige/50 text-sm">
+        OBS! Analysen gäller sidan du skriver in, inte övriga sidor på
+        webbplatsen.
+      </span>
     </form>
   );
 }
