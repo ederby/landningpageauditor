@@ -15,7 +15,7 @@ async function runPageSpeed(url: string, signal: AbortSignal): Promise<Response>
 }
 
 export async function fetchPageSpeed(url: string): Promise<PageSpeedResult> {
-  let res: Response
+  let res: Response | null = null
   let lastError: unknown
 
   for (let attempt = 1; attempt <= 2; attempt++) {
@@ -41,7 +41,7 @@ export async function fetchPageSpeed(url: string): Promise<PageSpeedResult> {
     if (attempt < 2) await new Promise(r => setTimeout(r, 2000))
   }
 
-  if (!res!.ok) throw lastError
+  if (!res?.ok) throw lastError
 
   const data = await res.json()
   const lr = data.lighthouseResult
