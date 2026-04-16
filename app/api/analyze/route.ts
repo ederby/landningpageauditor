@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-export const maxDuration = 25
+export const maxDuration = 60
 import { fetchPageSpeed } from '@/lib/pagespeed'
 import { parseHtml } from '@/lib/htmlParser'
 import { generateReport } from '@/lib/reportGenerator'
