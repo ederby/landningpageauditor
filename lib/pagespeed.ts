@@ -12,9 +12,24 @@ export async function fetchPageSpeed(url: string): Promise<PageSpeedResult> {
   const apiKey = process.env.PAGESPEED_API_KEY
   const endpoint = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=mobile${apiKey ? `&key=${apiKey}` : ''}`
 
-  const res = await fetch(endpoint, { next: { revalidate: 0 } })
+  let res: Response
+  try {
+    res = await fetch(endpoint, {
+      next: { revalidate: 0 },
+      signal: AbortSignal.timeout(20000),
+    })
+  } catch (err) {
+    if (err instanceof Error && err.name === 'TimeoutError') {
+      throw new Error('PageSpeed-analysen tog för lång tid – sajten kan vara för långsam eller otillgänglig.')
+    }
+    throw err
+  }
+
   if (!res.ok) {
-    throw new Error(`PageSpeed API returned ${res.status}`)
+    if (res.status === 429) {
+      throw new Error('PageSpeed-API:et är tillfälligt överbelastat. Vänta någon minut och försök igen.')
+    }
+    throw new Error(`PageSpeed-API:et svarade med felkod ${res.status}. Försök igen om en stund.`)
   }
 
   const data = await res.json()

@@ -97,7 +97,7 @@ export default function AnalyzerForm({ onReport }: Props) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full mx-auto flex flex-col items-center gap-2.5"
+      className="w-full max-w-200 mx-auto flex flex-col items-center gap-2.5"
     >
       <div className="w-full flex flex-col gap-3">
         <div className="flex flex-col sm:flex-row gap-4.5">

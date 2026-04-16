@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+
+export const maxDuration = 25
 import { fetchPageSpeed } from '@/lib/pagespeed'
 import { parseHtml } from '@/lib/htmlParser'
 import { generateReport } from '@/lib/reportGenerator'
@@ -95,7 +97,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ...report, competitor })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Okänt fel'
-    return NextResponse.json({ error: `Analysen misslyckades: ${message}` }, { status: 500 })
+    const message = err instanceof Error ? err.message : 'Något gick fel. Försök igen.'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

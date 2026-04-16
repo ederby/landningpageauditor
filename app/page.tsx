@@ -95,15 +95,15 @@ export default function Home() {
   return (
     <div className="min-h-[calc(100vh-80px)] bg-red flex flex-col">
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-20">
-        <div className="w-full max-w-237.5 text-center">
+        <div className="flex  flex-col w-full max-w-200 text-center">
           <h1 className="text-h1 font-bold leading-tight mb-5 text-beige">
             Hur optimerad är din webbplats egentligen?
           </h1>
-          <p className="text-beige text-lg mb-10">
+          <span className="text-beige text-lg mb-10">
             Analysera prestanda, SEO och konvertering och jämför direkt med en
             konkurrent. Perfekt för dig som vill förstå hur din webbplats kan
             bli bättre.
-          </p>
+          </span>
           <AnalyzerForm onReport={setReport} />
         </div>
       </main>

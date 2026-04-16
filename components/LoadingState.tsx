@@ -2,23 +2,23 @@
 
 import { useEffect, useState } from "react";
 
-const MESSAGES = [
-  "Hämtar din sida...",
-  "Kontrollerar prestanda...",
-  "Analyserar konverteringspunkter...",
-  "Granskar SEO...",
-  "Sammanställer rapport...",
+const TIPS = [
+  "💡 Första meningen på din sida är den viktigaste. Besökaren ska direkt förstå vad du erbjuder.",
+  "⚡ En långsam sida gör att folk lämnar innan de ens sett ditt erbjudande.",
+  "📱 De flesta besöker din sida på mobilen — se till att det ser bra ut på en liten skärm.",
+  "✍️ 'Kontakta oss' säger ingenting. 'Få ett gratis prisförslag' får fler att klicka.",
+  "🔒 Har din sida ett litet hänglås i adressfältet? Det bygger förtroende hos besökaren.",
+  "🌟 Omdömen och recensioner från riktiga kunder är ofta det som tippar en tveksam besökare.",
+  "🎯 Ha ett tydligt syfte med sidan — vad vill du att besökaren ska göra? Håll fokus på det.",
+  "🔍 Google bestämmer om din sida är relevant utifrån det du skriver. Var konkret och tydlig.",
+  "🖼️ Bilder som visar ditt riktiga arbete eller team skapar mer förtroende än stockfoton.",
+  "📞 Gör det enkelt att ta kontakt — en knapp eller ett telefonnummer räcker långt.",
+  "🎨 Din viktigaste knapp ska synas direkt. Om den smälter in missar du kunder.",
+  "💬 Skriv som du pratar. Krånglig text skrämmer bort folk — enkelt språk vinner.",
 ];
 
-const COMPETITOR_MESSAGES = [
-  "Hämtar din sida...",
-  "Hämtar konkurrentens sida...",
-  "Kontrollerar prestanda...",
-  "Analyserar konverteringspunkter...",
-  "Granskar SEO...",
-  "Jämför resultaten...",
-  "Sammanställer rapport...",
-];
+const MESSAGES = TIPS;
+const COMPETITOR_MESSAGES = TIPS;
 
 interface Props {
   hasCompetitor?: boolean;
@@ -31,7 +31,7 @@ export default function LoadingState({ hasCompetitor = false }: Props) {
   useEffect(() => {
     const interval = setInterval(() => {
       setIndex((i) => (i + 1) % messages.length);
-    }, 2000);
+    }, 4000);
     return () => clearInterval(interval);
   }, [messages.length]);
 
@@ -41,9 +41,9 @@ export default function LoadingState({ hasCompetitor = false }: Props) {
         <div className="absolute inset-0 rounded-full border-4 border-orange" />
         <div className="absolute inset-0 rounded-full border-4 border-beige border-t-transparent animate-spin" />
       </div>
-      <p className="text-orange text-base font-medium transition-all duration-500">
+      <span className="text-orange text-base text-[14px] font-medium transition-all duration-500">
         {messages[index]}
-      </p>
+      </span>
     </div>
   );
 }
