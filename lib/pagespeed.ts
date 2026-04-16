@@ -29,6 +29,8 @@ export async function fetchPageSpeed(url: string): Promise<PageSpeedResult> {
     if (res.status === 429) {
       throw new Error('PageSpeed-API:et är tillfälligt överbelastat. Vänta någon minut och försök igen.')
     }
+    const body = await res.text().catch(() => '(kunde inte läsa svar)')
+    console.error(`[PageSpeed] HTTP ${res.status} för ${url}:`, body)
     throw new Error(`PageSpeed-API:et svarade med felkod ${res.status}. Försök igen om en stund.`)
   }
 
